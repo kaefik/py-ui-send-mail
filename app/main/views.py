@@ -11,4 +11,12 @@ def index():
 def send():
     send_mail("ilnursoft@yandex.ru","test mail", "template_email")
     return redirect(url_for("index"))
-    
+
+@main.route("/create-template")
+def create_template():
+    return render_template("create-template.html")
+
+
+@main.route("/create-maillist")
+def create_maillist():
+    return render_template("create-maillist.html")

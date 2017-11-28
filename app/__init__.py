@@ -12,7 +12,6 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-
     mails.init_app(app)
 
     # здесь подключаются маршруты и нестандартные страницы с сообщениями об ошибках

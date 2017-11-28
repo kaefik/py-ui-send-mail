@@ -2,10 +2,22 @@
 
 import os
 import csv
+import configparser
+
 base_dir = os.path.abspath(os.path.dirname(__file__))
 
+namefile_cfg = "config.ini"
 
-namefile_cfg = "configs.cfg"
+config = configparser.ConfigParser()
+config.read(namefile_cfg)
+
+def str2bool(str):
+    if str.lower() == "true":
+        return True
+    else:
+        return False
+
+
 
 def get_csv_file(namefile_cfg):
     name_user =""
@@ -29,12 +41,13 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-    DEBUG = True
-    MAIL_SERVER = "smtp.gmail.com"
-    MAIL_PORT = 465
-    MAIL_USE_TLS  = False
-    MAIL_USE_SSL  = True
-    MAIL_USERNAME, MAIL_PASSWORD = get_csv_file(namefile_cfg)
+    DEBUG=True
+    MAIL_SERVER = str(config['MAIL']['MAIL_SERVER'])
+    MAIL_PORT = int(config['MAIL']['MAIL_PORT'])
+    MAIL_USE_TLS = str2bool(config['MAIL']['MAIL_USE_TLS'])
+    MAIL_USE_SSL = str2bool(config['MAIL']['MAIL_USE_SSL'])
+    MAIL_USERNAME = config['MAIL']['MAIL_USERNAME']
+    MAIL_PASSWORD = config['MAIL']['MAIL_PASSWORD']
 
 
 class TestingConfig(Config):
