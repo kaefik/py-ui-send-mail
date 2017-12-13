@@ -6,6 +6,8 @@ import configparser
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 
+path_template_mail = "template_mail"
+
 namefile_cfg = "config.ini"
 
 config = configparser.ConfigParser()

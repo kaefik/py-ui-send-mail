@@ -26,7 +26,7 @@ def index():
 @main.route("/send")
 def send():
     send_mail("ilnursoft@yandex.ru","test mail", "template_email")
-    return redirect(url_for("index"))
+    return redirect(url_for(".index"))
 
 @main.route("/create-template", methods=['GET', 'POST'])
 def create_template():
@@ -37,21 +37,10 @@ def create_template():
         
         subjectmail = str(request.form["subjectmail"])
         messagemail = str(request.form["messagemail"])  
-        createConfigMailTemplate("template1.cfg",subjectmail,messagemail)
-        
+        createConfigMailTemplate("template_mail/"+"template1.cfg",subjectmail,messagemail)
+        return redirect(url_for(".index"))
         """
-        if result is None:
             flash("Пользователь не найден или неверный пароль", "error")
-        else:
-            result_verify = result.verify_password(password_user)
-            if result_verify:
-                session["logged_in"] = True
-                session["username"] = username
-                session["role"] = result.role.name
-                flash("Вы вошли, как {}".format(username), "success")
-                return redirect(url_for("view"))
-            else:
-                flash("Пользователь не найден или неверный пароль", "error")
                 """
     return render_template("create-template.html",form=form)
 
