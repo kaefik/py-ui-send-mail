@@ -1,14 +1,14 @@
 {% extends 'layout.html' %}
 
 {% block body %}
+	{% from "includes/_formhelpers.html" import render_field %}
 
     Изменить шаблон письма <br><br>
-	<form target="_blank" action="/saveshablon/" enctype="multipart/form-data" method="post">
-		<b><input type="submit" name="button" value="Сохранить" />  <Br><Br>
-	    <b>Тема письма:</b><Br><Br>
-		<b>Содержание письма:</b><Br><Br>
-		<input name="subjectmail" type="text" size="50">	<Br><Br>	
-		<p><textarea name="multistroka" cols=100 rows=25></textarea></p>	
-		<br>
+	<form target="_self" enctype="multipart/form-data" method="post">
+		{{ form.csrf }}
+		{{ form.submit }}<br>
+		{{ render_field(form.subjectmail) }}<br>
+		{{ render_field(form.messagemail) }}<br>
 	</form>
+
 {% endblock %}
