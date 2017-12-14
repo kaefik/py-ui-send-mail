@@ -2,8 +2,10 @@
 
 {% import "bootstrap/wtf.html" as wtf %}
 
+
 {% block body %}
-	{% from "includes/_formhelpers.html" import render_field %}
+    {% include "includes/_messages.html" %}
+    {% from "includes/_formhelpers.html" import render_field %}
 
     Добавить список получателей рассылки <br><br>
     <form target="_self" enctype="multipart/form-data" method="post">	

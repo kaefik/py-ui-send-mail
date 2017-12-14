@@ -36,6 +36,7 @@ class Config:
     FLASKY_MAIL_SUBJECT_PREFIX = "[Flasky]"
     FLASKY_MAIL_SENDER = "Flasky Admin <ilnursoft@gmail.com>"
     FLASKY_ADMIN = os.environ.get("FLASKY_ADMIN")
+    SECRET_KEY = "super secret keys"
 
     @staticmethod
     def init_app(app):
@@ -43,7 +44,7 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-    DEBUG=True
+    DEBUG=True   
     MAIL_SERVER = str(config['MAIL']['MAIL_SERVER'])
     MAIL_PORT = int(config['MAIL']['MAIL_PORT'])
     MAIL_USE_TLS = str2bool(config['MAIL']['MAIL_USE_TLS'])
