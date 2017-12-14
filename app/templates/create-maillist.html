@@ -1,11 +1,19 @@
-
 {% extends 'layout.html' %}
 
+{% import "bootstrap/wtf.html" as wtf %}
+
 {% block body %}
-Изменить список получателей <br><br>
-<form target="_blank" action="/saverecipients/" enctype="multipart/form-data" method="post">
-    <b><input type="submit" name="button" value="Сохранить" />  <Br>
-    <p><textarea name="multistroka" cols=40 rows=30></textarea></p>	
-    <br>		
-</form>
+	{% from "includes/_formhelpers.html" import render_field %}
+
+    Добавить список получателей рассылки <br><br>
+    <form target="_self" enctype="multipart/form-data" method="post">	
+		<p>
+			{{ wtf.form_field(form.submit, class="btn btn-success ") }}		
+		</p>
+
+         <p>
+          {{ wtf.form_field(form.sendermail, class="form-control", rows="25%") }}
+        </p>
+	</form>
+
 {% endblock %}

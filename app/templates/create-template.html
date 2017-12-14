@@ -1,14 +1,24 @@
 {% extends 'layout.html' %}
 
+{% import "bootstrap/wtf.html" as wtf %}
+
 {% block body %}
 	{% from "includes/_formhelpers.html" import render_field %}
 
     Изменить шаблон письма <br><br>
-	<form target="_self" enctype="multipart/form-data" method="post">
+	<form class="form form-horizontal" method="post" role="form">
 		{{ form.csrf }}
-		{{ form.submit }}<br>
-		{{ render_field(form.subjectmail) }}<br>
-		{{ render_field(form.messagemail) }}<br>
+		<p>
+				{{ wtf.form_field(form.submit, class="btn btn-success") }}		
+		</p>
+
+		<p>		
+			{{ wtf.form_field(form.subjectmail) }}
+		</p>
+		<p>	
+			{{ wtf.form_field(form.messagemail, class="form-control", rows="25%") }}	
+		</p>
+		
 	</form>
 
 {% endblock %}

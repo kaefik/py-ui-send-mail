@@ -1,16 +1,12 @@
-<!DOCTYPE html>
+{% extends 'layout.html' %}
 
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>About</title>
-</head>
+{% block body %}
+	{% from "includes/_formhelpers.html" import render_field %}
 
-{% include "layout.html" %}
+    <h1>Сервис рассылки писем указанным адресатам по шаблону.</h1>
+    <p>
+        Автор: Ильнур Сайфутдинов
+        <a href="mailto:ilnursoft@gmail.com">ilnursoft@gmail.com    </a>
+    </p>
 
-{% include "_messages.html" %}
-<h1>Сервис выгрузки лога звонков</h1>
-
-
-</body>
-</html>
+{% endblock %}

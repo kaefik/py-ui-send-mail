@@ -1,6 +1,6 @@
 from flask import render_template, session, redirect, url_for, request
 from . import main
-from ..forms import CreateEmailTemplateForm
+from ..forms import CreateEmailTemplateForm, CreateEmailListSenderForm
 from ..email import send_mail
 import configparser
 
@@ -45,6 +45,24 @@ def create_template():
     return render_template("create-template.html",form=form)
 
 
-@main.route("/create-maillist")
+@main.route("/create-maillist", methods=['GET', 'POST'])
 def create_maillist():
-    return render_template("create-maillist.html")
+    form = CreateEmailListSenderForm(request.form)
+    if request.method == "POST":        
+       form = CreateEmailListSenderForm(request.form)
+    if (request.method == "POST") and form.validate():        
+        pass
+        """
+        subjectmail = str(request.form["subjectmail"])
+        messagemail = str(request.form["messagemail"])  
+        createConfigMailTemplate("template_mail/"+"template1.cfg",subjectmail,messagemail)
+        return redirect(url_for(".index"))
+        """
+        """
+            flash("Пользователь не найден или неверный пароль", "error")
+                """
+    return render_template("create-maillist.html", form=form)
+
+@main.route("/about")
+def about():
+    return render_template("about.html")
