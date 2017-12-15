@@ -87,6 +87,47 @@ def create_maillist():
         return redirect(url_for(".index"))
     return render_template("create-maillist.html", form=form)
 
+
+
+
+@main.route("/view-maillist")
+def view_maillist():
+    file_names = listdir(path_sender_list)
+    # print(file_names)
+    if file_names == []:
+        flash("Нет списков рассылки. Создайте его.","error")
+        return redirect(url_for(".index"))    
+
+    data_maillist = list()
+    for i in file_names:
+        dict_data_maillist = dict()
+        dict_data_maillist["name"] = i
+        namefile = path_sender_list+i
+        with open(namefile,"r") as f:
+            dict_data_maillist["data"]=f.read()
+        data_maillist.append(dict_data_maillist)        
+    # print(data_maillist)
+    return render_template("view-maillist.html",data=data_maillist)
+
+@main.route("/view-templatemail")
+def view_templatemail():
+    file_names = listdir(path_template_mail)
+    # print(file_names)
+    if file_names == []:
+        flash("Нет ни одного шаблона писема. Создайте его.","error")
+        return redirect(url_for(".index"))    
+
+    data_templatemail = list()
+    for i in file_names:
+        dict_data_maillist = dict()
+        dict_data_maillist["name"] = i
+        namefile = path_template_mail+i
+        with open(namefile,"r") as f:
+            dict_data_maillist["data"]=f.read()
+        data_templatemail.append(dict_data_maillist)        
+    # print(data_maillist)
+    return render_template("view-templatemail.html",data=data_templatemail)
+
 @main.route("/about")
 def about():
     return render_template("about.html")
