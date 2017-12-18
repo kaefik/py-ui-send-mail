@@ -103,8 +103,10 @@ def view_maillist():
         dict_data_maillist = dict()
         dict_data_maillist["name"] = i
         namefile = path_sender_list+i
-        with open(namefile,"r") as f:
-            dict_data_maillist["data"]=f.read()
+
+        data_cfg = configparser.ConfigParser()
+        data_cfg.read(namefile)        
+        dict_data_maillist["data"] = data_cfg['SENDERMAILLIST']['adresslist']
         data_maillist.append(dict_data_maillist)        
     # print(data_maillist)
     return render_template("view-maillist.html",data=data_maillist)
@@ -122,8 +124,12 @@ def view_templatemail():
         dict_data_maillist = dict()
         dict_data_maillist["name"] = i
         namefile = path_template_mail+i
-        with open(namefile,"r") as f:
-            dict_data_maillist["data"]=f.read()
+
+        data_cfg = configparser.ConfigParser()
+        data_cfg.read(namefile)        
+        dict_data_maillist["subject"] = data_cfg['TEMPLATEMAIL']['subject']
+        dict_data_maillist["template"] = data_cfg['TEMPLATEMAIL']['template']
+
         data_templatemail.append(dict_data_maillist)        
     # print(data_maillist)
     return render_template("view-templatemail.html",data=data_templatemail)
