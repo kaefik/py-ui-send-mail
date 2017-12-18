@@ -17,9 +17,12 @@
                 <tr>
                     <td>{{ ind["name"] }}</td>
                     <td>{{ ind["subject"] }}</td> 
-                    <td>{{ ind["template"] }}</td>                    
+                    <td>
+                        <textarea class="form-control" rows="15%" disabled="true">                            
+                        {{ ind["template"] }}
+                        </textarea>
+                    </td>                    
                 </tr>
-
         {% endfor %}
         <table>
 </p>
