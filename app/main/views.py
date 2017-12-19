@@ -1,6 +1,6 @@
 from flask import render_template, session, redirect, url_for, request, flash
 from . import main
-from ..forms import CreateEmailTemplateForm, CreateEmailListSenderForm
+from ..forms import CreateEmailTemplateForm, CreateEmailListSenderForm, CreateTaskForm
 from ..email import send_mail
 import configparser
 from os import listdir
@@ -94,9 +94,9 @@ def create_maillist():
 
 @main.route("/create-task", methods=['GET', 'POST'])
 def create_task():
-    form = CreateEmailListSenderForm(request.form)
+    form = CreateTaskForm(request.form)    
     if request.method == "POST":        
-       form = CreateEmailListSenderForm(request.form)
+       form = CreateTaskForm(request.form)
     if (request.method == "POST") and form.validate():        
         sendermail = str(request.form["sendermail"])
         name_maillist = str(request.form["name_maillist"])

@@ -6,19 +6,21 @@
 {% block body %}
     {% include "includes/_messages.html" %}
     {% from "includes/_formhelpers.html" import render_field %}
-
-    Добавить список получателей рассылки <br><br>
+    <br>
+    <p>
+      Нужно выбрать список расслки и шаблон письма и нажмите кнопку Отправить       
+  </p>
     <form target="_self" enctype="multipart/form-data" method="post">	
 		<p>
 			{{ wtf.form_field(form.submit, class="btn btn-success ") }}		
     </p>
     
     <p>
-      {{ wtf.form_field(form.name_maillist, class="form-control") }}
+      {{ wtf.form_field(form.name_maillist()) }}
     </p>
 
          <p>
-          {{ wtf.form_field(form.sendermail, class="form-control", rows="25%") }}
+          {{ wtf.form_field(form.name_templatemail, class="form-control", rows="25%") }}
         </p>
 	</form>
 
