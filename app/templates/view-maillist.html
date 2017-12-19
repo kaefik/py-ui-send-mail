@@ -8,12 +8,14 @@
 <p>
     <table border="1" cellpadding="7" cellspacing="0" class="table table-striped table-hover table-condensed " >
         <tr>
+            <td align="center">Номер списка</td>
             <td align="center">Название списка</td>
             <td align="center">Содержимое списка</td>            
         </tr>
     
         {% for ind in data %}
                 <tr>
+                        <td>{{ ind["name_file"] }}</td>    
                     <td>{{ ind["name"] }}</td>
                     <td>{{ ind["data"] }}</td>                    
                 </tr>

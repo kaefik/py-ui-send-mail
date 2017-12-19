@@ -4,6 +4,7 @@ from ..forms import CreateEmailTemplateForm, CreateEmailListSenderForm
 from ..email import send_mail
 import configparser
 from os import listdir
+import os
 
 
 path_template_mail = "data/template_mail/"  # пусть где хранятся шаблоны писем
@@ -21,12 +22,13 @@ def createConfigMailTemplate(path,subject_mail,message_mail):
         config.write(config_file)
     return True
 
-def createConfigMailSender(path,sender_mail):
+def createConfigMailSender(path,sender_mail,name_list):
     """
     Create a config file для списка рассылки
     """
     config = configparser.ConfigParser()
     config.add_section("SENDERMAILLIST")
+    config.set("SENDERMAILLIST", "namelist",name_list)           
     config.set("SENDERMAILLIST", "adresslist",sender_mail)           
     with open(path, "w") as config_file:
         config.write(config_file)
@@ -37,6 +39,8 @@ def generate_filename(path):
       генерация имени файла, имена файлов номер_по_порядку
     """
     filename=""
+    if not os.path.exists(path):
+        os.mkdir(path)
     file_names = listdir(path)
     # print(file_names)
     if file_names == []:
@@ -82,12 +86,24 @@ def create_maillist():
        form = CreateEmailListSenderForm(request.form)
     if (request.method == "POST") and form.validate():        
         sendermail = str(request.form["sendermail"])
-        createConfigMailSender(path_sender_list+generate_filename(path_sender_list),sendermail)
+        name_maillist = str(request.form["name_maillist"])
+        createConfigMailSender(path_sender_list+generate_filename(path_sender_list),sendermail,name_maillist)
         flash("Создан новый список рассылки","success")
         return redirect(url_for(".index"))
     return render_template("create-maillist.html", form=form)
 
-
+@main.route("/create-task", methods=['GET', 'POST'])
+def create_task():
+    form = CreateEmailListSenderForm(request.form)
+    if request.method == "POST":        
+       form = CreateEmailListSenderForm(request.form)
+    if (request.method == "POST") and form.validate():        
+        sendermail = str(request.form["sendermail"])
+        name_maillist = str(request.form["name_maillist"])
+        createConfigMailSender(path_sender_list+generate_filename(path_sender_list),sendermail,name_maillist)
+        flash("Создан новый список рассылки","success")
+        return redirect(url_for(".index"))
+    return render_template("create-task.html", form=form)
 
 
 @main.route("/view-maillist")
@@ -101,12 +117,13 @@ def view_maillist():
     data_maillist = list()
     for i in file_names:
         dict_data_maillist = dict()
-        dict_data_maillist["name"] = i
+        dict_data_maillist["name_file"] = i
         namefile = path_sender_list+i
 
         data_cfg = configparser.ConfigParser()
         data_cfg.read(namefile)        
         dict_data_maillist["data"] = data_cfg['SENDERMAILLIST']['adresslist']
+        dict_data_maillist["name"] = data_cfg['SENDERMAILLIST']['namelist']
         data_maillist.append(dict_data_maillist)        
     # print(data_maillist)
     return render_template("view-maillist.html",data=data_maillist)
