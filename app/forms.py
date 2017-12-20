@@ -20,9 +20,10 @@ class CreateTaskForm(Form):
         """        
     name_maillist = SelectField('Список рассылки')
     name_templatemail = SelectField('Шаблон письма ', default=1, choices=[(1,'one'),(2,'two')])
-    submit = SubmitField("Отправить")
-    def __init__(self, *args, **kwargs):
-        self.name_maillist.choices = [(1,'один'),(2,'два')] 
+    submit = SubmitField("Отправить")    
+    def __init__(self, selection_choices):
+        super(CreateTaskForm, self).__init__()        
+        self.name_maillist.choices = [(1,'ОДЫН'),(2,'ДВА')]  # selection_choices 
         
 
         

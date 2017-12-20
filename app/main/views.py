@@ -94,9 +94,8 @@ def create_maillist():
 
 @main.route("/create-task", methods=['GET', 'POST'])
 def create_task():
-    form = CreateTaskForm(request.form)    
-    if request.method == "POST":        
-       form = CreateTaskForm(request.form)
+    d = [(1,'одsн'),(2,'два')] 
+    form = CreateTaskForm(request.form)        
     if (request.method == "POST") and form.validate():        
         sendermail = str(request.form["sendermail"])
         name_maillist = str(request.form["name_maillist"])
@@ -147,8 +146,7 @@ def view_templatemail():
         dict_data_maillist["subject"] = data_cfg['TEMPLATEMAIL']['subject']
         dict_data_maillist["template"] = data_cfg['TEMPLATEMAIL']['template']
 
-        data_templatemail.append(dict_data_maillist)        
-    # print(data_maillist)
+        data_templatemail.append(dict_data_maillist)            
     return render_template("view-templatemail.html",data=data_templatemail)
 
 @main.route("/about")

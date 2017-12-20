@@ -12,15 +12,15 @@
   </p>
     <form target="_self" enctype="multipart/form-data" method="post">	
 		<p>
-			{{ wtf.form_field(form.submit, class="btn btn-success ") }}		
+			{{form.submit }}		
     </p>
     
     <p>
-      {{ wtf.form_field(form.name_maillist()) }}
+      {{ form.name_maillist() }}
     </p>
 
          <p>
-          {{ wtf.form_field(form.name_templatemail, class="form-control", rows="25%") }}
+          {{ form.name_templatemail }}
         </p>
 	</form>
 
