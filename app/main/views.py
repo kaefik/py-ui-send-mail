@@ -96,6 +96,7 @@ def create_maillist():
 def create_task():
     d = [(1,'одsн'),(2,'два')] 
     form = CreateTaskForm(request.form)        
+    form.set_selectfield()
     if (request.method == "POST") and form.validate():        
         sendermail = str(request.form["sendermail"])
         name_maillist = str(request.form["name_maillist"])
