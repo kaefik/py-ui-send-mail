@@ -20,20 +20,17 @@ class CreateTaskForm(Form):
         """        
     name_maillist = SelectField('Список рассылки')
     name_templatemail = SelectField('Шаблон письма ', default=1, choices=[(1,'one'),(2,'two')])
+    content_maillist = TextAreaField("Содержимое списка рассылки", [validators.Length(min=5)])    
     submit = SubmitField("Отправить")    
-    def set_selectfield(self,selection_choices=[]):
-        array_data=[]
-        i=0
-        for data in selection_choices:
-            array_data.append((i,data))
-            i=i+1
-        if array_data==[]:
-            array_data=[(0,"нет")]
-        self.name_maillist.choices =array_data  
+    def set_selectfield_maillist(self,selection_choices=[]):
+        if selection_choices==[]:
+            selection_choices=[(-1,"нет элементов")]
+        self.name_maillist.choices =selection_choices  
+    def set_selectfield_templatemail(self,selection_choices=[]):
+        if selection_choices==[]:
+            selection_choices=[(-1,"нет элементов")]
+        self.name_templatemail.choices =selection_choices  
         
-
-        
-
 
 """
 class UserDetails(Form):

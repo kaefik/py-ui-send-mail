@@ -15,12 +15,31 @@
 			{{form.submit }}		
     </p>
     
+    <div class="row marketing">
+      <div class="col-lg-6">
+        <h4>{{ form.name_maillist.label }}</h4>
+        <p> {{ form.name_maillist() }} </p>
+
+        <h5>Содержимое</h5>
+        <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+      </div>
+
+      <div class="col-lg-6">
+        <h4>{{ form.name_templatemail.label }}</h4>
+        <p> {{ form.name_templatemail }} </p>
+
+        <h5>Содержимое</h5>
+        <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+        
+      </div>
+    </div>
+ 
     <p>
-      {{ form.name_maillist() }}
+      
     </p>
 
          <p>
-          {{ form.name_templatemail }}
+          
         </p>
 	</form>
 
