@@ -84,13 +84,10 @@ def get_content_templatemail(path=path_template_mail):
     """
         получение содержимое конфиг файла шаблонов писем
     """
-    file_names = listdir(path)
-    # print(file_names)
-    if file_names == []:
-        flash("Нет ни одного шаблона писема. Создайте его.","error")
-        return redirect(url_for(".index"))    
-
     data_templatemail = list()
+    file_names = listdir(path)
+    # print(file_names)   
+    
     for i in file_names:
         dict_data_maillist = dict()
         dict_data_maillist["name_file"] = i
@@ -110,10 +107,7 @@ def get_content_maillist(path=path_sender_list):
     """
     file_names = listdir(path)
     # print(file_names)
-    if file_names == []:
-        flash("Нет списков рассылки. Создайте его.","error")
-        return redirect(url_for(".index"))    
-
+ 
     data_maillist = list()
     for i in file_names:
         dict_data_maillist = dict()
@@ -179,17 +173,23 @@ def create_task():
     for el in dict_data_maillist:
         choices_maillist.append((el["name_file"],el["name"]))    
 
-    choices_template = [] # get_content_files(path_sender_list)  
+
+    choices_template = [] # get_content_files(path_sender_list)     
     for el in dict_data_template:
-        choices_template.append((el["name_file"],el["subject"]))     
+        choices_template.append((el["name_file"],el["subject"])) 
+       
 
     form.set_selectfield_maillist(selection_choices=choices_maillist)
     form.set_selectfield_templatemail(selection_choices=choices_template)
     if (request.method == "POST") and form.validate():        
-        sendermail = str(request.form["sendermail"])
-        name_maillist = str(request.form["name_maillist"])
-        createConfigMailSender(path_sender_list+generate_filename(path_sender_list),sendermail,name_maillist)
-        flash("Создан новый список рассылки","success")
+        select_maillist = request.form["name_maillist"]
+        select_template = request.form["name_templatemail"]
+        print("select_maillist = ",select_maillist)
+        print("select_template = ",select_template)
+        if (select_maillist==-1) or (select_template==-1):
+            flash("Невозможно создать задачу на отправку","error")
+        else:
+            flash("Создана новая задача на отправку","success")
         return redirect(url_for(".index"))
     return render_template("create-task.html", form=form, data_maillist=dict_data_maillist,data_templatemail=dict_data_template)
 
