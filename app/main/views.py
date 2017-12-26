@@ -9,6 +9,7 @@ import os
 
 path_template_mail = "data/template_mail/"  # пусть где хранятся шаблоны писем
 path_sender_list = "data/sender_list/"  # пусть где хранятся списки отправки
+path_task = "data/task/"  # пусть где хранятся задачи
 
 def createConfigMailTemplate(path,subject_mail,message_mail):
     """ 
@@ -33,6 +34,22 @@ def createConfigMailSender(path,sender_mail,name_list):
     with open(path, "w") as config_file:
         config.write(config_file)
     return True
+
+def create_cfg_task(path, id_maillist=-1,id_template=-1):
+    """
+        Создание конфигурационного файла для задачи которую нужно выполнить
+    """
+    if (id_maillist==-1) and (id_template==-1):
+        return False
+
+    config = configparser.ConfigParser()
+    config.add_section("TASK")
+    config.set("TASK", "maillist",id_maillist)           
+    config.set("TASK", "templatemail",id_template)           
+    with open(path, "w") as config_file:
+        config.write(config_file)
+    return True
+
 
 def generate_filename(path=path_sender_list):
     """
@@ -182,14 +199,24 @@ def create_task():
     form.set_selectfield_maillist(selection_choices=choices_maillist)
     form.set_selectfield_templatemail(selection_choices=choices_template)
     if (request.method == "POST") and form.validate():        
-        select_maillist = request.form["name_maillist"]
-        select_template = request.form["name_templatemail"]
-        print("select_maillist = ",select_maillist)
-        print("select_template = ",select_template)
-        if (select_maillist==-1) or (select_template==-1):
+        id_select_maillist = request.form["name_maillist"]
+        id_select_template = request.form["name_templatemail"]
+        # print("id_select_maillist = ",id_select_maillist)
+        # print("id_select_template = ",id_select_template)
+        if (id_select_maillist==-1) or (id_select_template==-1):
             flash("Невозможно создать задачу на отправку","error")
-        else:
-            flash("Создана новая задача на отправку","success")
+            return redirect(url_for(".index"))
+        select_maillist = ""
+        for el in dict_data_maillist:
+            if el["name_file"]==id_select_maillist:
+                select_maillist = el
+        select_template=""
+        for el in dict_data_template:
+            if el["name_file"]==id_select_template:
+                select_template = el
+
+        create_cfg_task(path_task+generate_filename(path_task),id_select_maillist,id_select_template)
+        flash("Создана новая задача на отправку","success")
         return redirect(url_for(".index"))
     return render_template("create-task.html", form=form, data_maillist=dict_data_maillist,data_templatemail=dict_data_template)
 
