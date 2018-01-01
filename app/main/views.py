@@ -1,12 +1,12 @@
 from flask import render_template, session, redirect, url_for, request, flash
 from . import main
 from ..forms import CreateEmailTemplateForm, CreateEmailListSenderForm, CreateTaskForm
-from ..email import send_mail
+from ..email import send_mail2
 import configparser
 from os import listdir
 import os
 
-
+path_absolute = "app/templates/"
 path_template_mail = "data/template_mail/"  # пусть где хранятся шаблоны писем
 path_sender_list = "data/sender_list/"  # пусть где хранятся списки отправки
 path_task = "data/task/"  # пусть где хранятся задачи
@@ -37,7 +37,7 @@ def createConfigMailSender(path,sender_mail,name_list):
 
 def create_cfg_task(path, id_maillist=-1,id_template=-1):
     """
-        Создание конфигурационного файла для задачи которую нужно выполнить
+        Создание конфигурационного файла для задачи которую нужно выполнить, возвращает путь созданного задания отправки
     """
     if (id_maillist==-1) and (id_template==-1):
         return False
@@ -48,10 +48,42 @@ def create_cfg_task(path, id_maillist=-1,id_template=-1):
     config.set("TASK", "templatemail",id_template)           
     with open(path, "w") as config_file:
         config.write(config_file)
-    return True
+    return path
 
+def get_cfg_task(path):
+    """
+        получение содержимого из файла конфигурации
+    """
+    result=dict()
+    data_cfg = configparser.ConfigParser()
+    data_cfg.read(path)        
+    result["maillist"] = data_cfg['TASK']['maillist']
+    result["templatemail"] = data_cfg['TASK']['templatemail']
+    return result
 
-def generate_filename(path=path_sender_list):
+def get_cfg_maillist(path):
+    """
+        получение содержимого из файла конфигурации списка рассылки
+    """
+    result=dict()
+    data_cfg = configparser.ConfigParser()
+    data_cfg.read(path)        
+    result["data"] = data_cfg['SENDERMAILLIST']['adresslist']
+    result["name"] = data_cfg['SENDERMAILLIST']['namelist']
+    return result
+
+def get_cfg_templatemail(path):
+    """
+        получение содержимого из файла конфигурации шаблона письма
+    """
+    result=dict()
+    data_cfg = configparser.ConfigParser()
+    data_cfg.read(path)        
+    result["subject"] = data_cfg['TEMPLATEMAIL']['subject']
+    result["template"] = data_cfg['TEMPLATEMAIL']['template']
+    return result
+
+def generate_filename(path=path_absolute+path_sender_list):
     """
       генерация имени файла, имена файлов номер_по_порядку
     """
@@ -71,7 +103,7 @@ def generate_filename(path=path_sender_list):
        
     return filename
 
-def get_all_files(path=path_sender_list):
+def get_all_files(path=path_absolute+path_sender_list):
     """
       возвращает все имена файлов в папке path
     """
@@ -85,7 +117,7 @@ def get_all_files(path=path_sender_list):
        
     return file_names
 
-def get_content_files(path=path_sender_list):
+def get_content_files(path=path_absolute+path_sender_list):
     """ 
         получение содержимое всех файлов из папки path   ???? - кандидат на удаление
     """
@@ -97,7 +129,7 @@ def get_content_files(path=path_sender_list):
     return content_files
 
 
-def get_content_templatemail(path=path_template_mail):
+def get_content_templatemail(path=path_absolute+path_template_mail):
     """
         получение содержимое конфиг файла шаблонов писем
     """
@@ -106,19 +138,17 @@ def get_content_templatemail(path=path_template_mail):
     # print(file_names)   
     
     for i in file_names:
-        dict_data_maillist = dict()
-        dict_data_maillist["name_file"] = i
         namefile = path+i
-
-        data_cfg = configparser.ConfigParser()
-        data_cfg.read(namefile)        
-        dict_data_maillist["subject"] = data_cfg['TEMPLATEMAIL']['subject']
-        dict_data_maillist["template"] = data_cfg['TEMPLATEMAIL']['template']
-
+        #data_cfg = configparser.ConfigParser()
+        #data_cfg.read(namefile)        
+        #dict_data_maillist["subject"] = data_cfg['TEMPLATEMAIL']['subject']
+        #dict_data_maillist["template"] = data_cfg['TEMPLATEMAIL']['template']
+        dict_data_maillist = get_cfg_templatemail(namefile)
+        dict_data_maillist["name_file"] = i
         data_templatemail.append(dict_data_maillist)    
     return data_templatemail
 
-def get_content_maillist(path=path_sender_list):
+def get_content_maillist(path=path_absolute+path_sender_list):
     """
         получение содержимое конфиг файла списков рассылки
     """
@@ -127,23 +157,38 @@ def get_content_maillist(path=path_sender_list):
  
     data_maillist = list()
     for i in file_names:
-        dict_data_maillist = dict()
-        dict_data_maillist["name_file"] = i
+        # dict_data_maillist = dict()        
         namefile = path+i
-
-        data_cfg = configparser.ConfigParser()
-        data_cfg.read(namefile)        
-        dict_data_maillist["data"] = data_cfg['SENDERMAILLIST']['adresslist']
-        dict_data_maillist["name"] = data_cfg['SENDERMAILLIST']['namelist']
-        data_maillist.append(dict_data_maillist)       
-
+        #data_cfg = configparser.ConfigParser()
+        #data_cfg.read(namefile)        
+        #dict_data_maillist["data"] = data_cfg['SENDERMAILLIST']['adresslist']
+        #dict_data_maillist["name"] = data_cfg['SENDERMAILLIST']['namelist']        
+        dict_data_maillist = get_cfg_maillist(namefile)      
+        dict_data_maillist["name_file"] = i
+        data_maillist.append(dict_data_maillist) 
     return data_maillist
 
+
+def send_mail_from_task(filename_task):
+    """
+        если задача обработана, возращается True и файл задачи переносится в папку data/task/done
+    """
+    # разбор файла конфигурации задачи
+    cfg_task = get_cfg_task(filename_task)
+    maillist = get_cfg_maillist(path_absolute+path_sender_list+cfg_task["maillist"])
+    templatemail = get_cfg_templatemail(path_absolute+path_template_mail+cfg_task["templatemail"])
+    print("templatemail = ",templatemail)
+    array_maillist = maillist["data"].split("\n")
+    # print("array_maillist = ",array_maillist)
+    for address in array_maillist:
+        send_mail2(address,templatemail["subject"],templatemail["template"])
+    return True
+
+# --------- маршруты
 
 @main.route("/")
 def index():
     return render_template("index.html")
-
 
 @main.route("/send")
 def send():
@@ -158,7 +203,7 @@ def create_template():
     if (request.method == "POST") and form.validate():    
         subjectmail = str(request.form["subjectmail"])
         messagemail = str(request.form["messagemail"])  
-        createConfigMailTemplate(path_template_mail+generate_filename(path_template_mail),subjectmail,messagemail)
+        createConfigMailTemplate(path_absolute+path_template_mail+generate_filename(path_absolute+path_template_mail),subjectmail,messagemail)
         flash("Создан новый шаблон сообщения","success")
         return redirect(url_for(".index"))
     return render_template("create-template.html",form=form)
@@ -172,29 +217,28 @@ def create_maillist():
     if (request.method == "POST") and form.validate():        
         sendermail = str(request.form["sendermail"])
         name_maillist = str(request.form["name_maillist"])
-        createConfigMailSender(path_sender_list+generate_filename(path_sender_list),sendermail,name_maillist)
+        createConfigMailSender(path_absolute+path_sender_list+generate_filename(path_absolute+path_sender_list),sendermail,name_maillist)
         flash("Создан новый список рассылки","success")
         return redirect(url_for(".index"))
     return render_template("create-maillist.html", form=form)
 
 @main.route("/create-task", methods=['GET', 'POST'])
 def create_task():
-    d = [(1,'одsн'),(2,'два')] 
     form = CreateTaskForm(request.form)        
 
-    dict_data_maillist = get_content_maillist(path_sender_list)
-    dict_data_template = get_content_templatemail(path_template_mail)
+    dict_data_maillist = get_content_maillist(path_absolute+path_sender_list)    
+    dict_data_template = get_content_templatemail(path_absolute+path_template_mail)
+
+    print("dict_data_maillist = ", dict_data_maillist)
 
     # генерация списка выбора списка рассылки
     choices_maillist =[] # get_content_files(path_template_mail)    
     for el in dict_data_maillist:
         choices_maillist.append((el["name_file"],el["name"]))    
 
-
     choices_template = [] # get_content_files(path_sender_list)     
     for el in dict_data_template:
-        choices_template.append((el["name_file"],el["subject"])) 
-       
+        choices_template.append((el["name_file"],el["subject"]))        
 
     form.set_selectfield_maillist(selection_choices=choices_maillist)
     form.set_selectfield_templatemail(selection_choices=choices_template)
@@ -215,7 +259,14 @@ def create_task():
             if el["name_file"]==id_select_template:
                 select_template = el
 
-        create_cfg_task(path_task+generate_filename(path_task),id_select_maillist,id_select_template)
+        filename_task = create_cfg_task(path_absolute+path_task+generate_filename(path_absolute+path_task),id_select_maillist,id_select_template)
+
+        if filename_task!=False:  # проверяем создана ли задача           
+            send_mail_from_task(filename_task)
+            # после выполнения рассылки задача перемещается в папку done и 
+            # имя задачи менятся на дату и время начала выполнения задачи
+            os.rename(filename_task,"newfile",dst_dir_fd=path_absolute+path_task+"/done")
+
         flash("Создана новая задача на отправку","success")
         return redirect(url_for(".index"))
     return render_template("create-task.html", form=form, data_maillist=dict_data_maillist,data_templatemail=dict_data_template)
@@ -223,14 +274,16 @@ def create_task():
 
 @main.route("/view-maillist")
 def view_maillist():
-    data_maillist = get_content_maillist(path_sender_list)
+    data_maillist = get_content_maillist(path_absolute+path_sender_list)
     return render_template("view-maillist.html",data=data_maillist)
 
 @main.route("/view-templatemail")
 def view_templatemail():    
-    data_templatemail = get_content_templatemail(path_template_mail)           
+    data_templatemail = get_content_templatemail(path_absolute+path_template_mail)           
     return render_template("view-templatemail.html",data=data_templatemail)
 
 @main.route("/about")
 def about():
     return render_template("about.html")
+
+# --------- END маршруты

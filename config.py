@@ -33,9 +33,6 @@ def get_csv_file(namefile_cfg):
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
-    FLASKY_MAIL_SUBJECT_PREFIX = "[Flasky]"
-    FLASKY_MAIL_SENDER = "Flasky Admin <ilnursoft@gmail.com>"
-    FLASKY_ADMIN = os.environ.get("FLASKY_ADMIN")
     SECRET_KEY = "super secret keys"
 
     @staticmethod
@@ -51,6 +48,9 @@ class DevelopmentConfig(Config):
     MAIL_USE_SSL = str2bool(config['MAIL']['MAIL_USE_SSL'])
     MAIL_USERNAME = config['MAIL']['MAIL_USERNAME']
     MAIL_PASSWORD = config['MAIL']['MAIL_PASSWORD']
+    FLASKY_MAIL_SUBJECT_PREFIX = ""
+    MAIL_SENDER =config['MAIL']['MAIL_SENDER']  # TODO: сделать так чтобы обрабатывалась заголовок на кирилице
+    # FLASKY_ADMIN = os.environ.get("FLASKY_ADMIN")
 
 
 class TestingConfig(Config):
