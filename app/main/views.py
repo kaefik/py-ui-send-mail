@@ -265,7 +265,10 @@ def create_task():
             send_mail_from_task(filename_task)
             # после выполнения рассылки задача перемещается в папку done и 
             # имя задачи менятся на дату и время начала выполнения задачи
-            os.rename(filename_task,"newfile",dst_dir_fd=path_absolute+path_task+"/done")
+            ar = os.path.split(filename_task)            
+            #print("filename_task = ",filename_task)
+            #print("templates/data/task_done/ +ar[-1] = ",os.path.exists("templates/data/task_done/"+ar[-1]))
+            os.rename(filename_task,"app/templates/data/task_done/"+ar[-1])
 
         flash("Создана новая задача на отправку","success")
         return redirect(url_for(".index"))
