@@ -35,9 +35,11 @@ def createConfigMailSender(path,sender_mail,name_list):
         config.write(config_file)
     return True
 
+# кандидат на удаление
 def create_cfg_task(path, id_maillist=-1,id_template=-1):
     """
         Создание конфигурационного файла для задачи которую нужно выполнить, возвращает путь созданного задания отправки
+        файл задачи содержит только номера файлов списка рассылки и шаблоны письма
     """
     if (id_maillist==-1) and (id_template==-1):
         return False
@@ -50,7 +52,32 @@ def create_cfg_task(path, id_maillist=-1,id_template=-1):
         config.write(config_file)
     return path
 
-def get_cfg_task(path):
+def create_cfg_task_full(path, id_maillist=-1,id_template=-1,nametask="Безназвания"):
+    """
+        Создание конфигурационного файла для задачи которую нужно выполнить, возвращает путь созданного задания отправки
+        файл задачи содержит содержимое списка рассылки и шаблона письма
+    """
+    if (id_maillist==-1) and (id_template==-1):
+        return False
+
+    maillist = get_cfg_maillist(path_absolute+path_sender_list+id_maillist)
+    templatemail = get_cfg_templatemail(path_absolute+path_template_mail+id_template)
+   
+    config = configparser.ConfigParser()
+    config.add_section("TASK")
+    config.set("TASK", "nametask",nametask)
+    config.add_section("SENDERMAILLIST")
+    config.set("SENDERMAILLIST", "namelist",maillist["name"])
+    config.set("SENDERMAILLIST", "adresslist",maillist["data"])
+    config.add_section("TEMPLATEMAIL")
+    config.set("TEMPLATEMAIL", "subject",templatemail["subject"])
+    config.set("TEMPLATEMAIL", "template",templatemail["template"])
+    with open(path, "w") as config_file:
+        config.write(config_file)   
+    return path
+
+# кндидат на удаление
+def get_cfg_task_old(path):
     """
         получение содержимого из файла конфигурации
     """
@@ -59,6 +86,20 @@ def get_cfg_task(path):
     data_cfg.read(path)        
     result["maillist"] = data_cfg['TASK']['maillist']
     result["templatemail"] = data_cfg['TASK']['templatemail']
+    return result
+
+def get_cfg_task(path):
+    """
+        получение содержимого из файла конфигурации
+    """
+    result=dict()
+    data_cfg = configparser.ConfigParser()
+    data_cfg.read(path)        
+    result["nametask"] = data_cfg['TASK']['nametask']
+    result["namelist"] = data_cfg['SENDERMAILLIST']['namelist']
+    result["adresslist"] = data_cfg['SENDERMAILLIST']['adresslist']
+    result["subject"] = data_cfg['TEMPLATEMAIL']['subject']
+    result["template"] = data_cfg['TEMPLATEMAIL']['template']
     return result
 
 def get_cfg_maillist(path):
@@ -139,10 +180,6 @@ def get_content_templatemail(path=path_absolute+path_template_mail):
     
     for i in file_names:
         namefile = path+i
-        #data_cfg = configparser.ConfigParser()
-        #data_cfg.read(namefile)        
-        #dict_data_maillist["subject"] = data_cfg['TEMPLATEMAIL']['subject']
-        #dict_data_maillist["template"] = data_cfg['TEMPLATEMAIL']['template']
         dict_data_maillist = get_cfg_templatemail(namefile)
         dict_data_maillist["name_file"] = i
         data_templatemail.append(dict_data_maillist)    
@@ -157,19 +194,14 @@ def get_content_maillist(path=path_absolute+path_sender_list):
  
     data_maillist = list()
     for i in file_names:
-        # dict_data_maillist = dict()        
-        namefile = path+i
-        #data_cfg = configparser.ConfigParser()
-        #data_cfg.read(namefile)        
-        #dict_data_maillist["data"] = data_cfg['SENDERMAILLIST']['adresslist']
-        #dict_data_maillist["name"] = data_cfg['SENDERMAILLIST']['namelist']        
+        namefile = path+i      
         dict_data_maillist = get_cfg_maillist(namefile)      
         dict_data_maillist["name_file"] = i
         data_maillist.append(dict_data_maillist) 
     return data_maillist
 
-
-def send_mail_from_task(filename_task):
+# кандидат на удаление
+def send_mail_from_task_old(filename_task): 
     """
         если задача обработана, возращается True и файл задачи переносится в папку data/task/done
     """
@@ -182,6 +214,22 @@ def send_mail_from_task(filename_task):
     # print("array_maillist = ",array_maillist)
     for address in array_maillist:
         send_mail2(address,templatemail["subject"],templatemail["template"])
+    return True
+
+def send_mail_from_task(filename_task):
+    """
+        если задача обработана, возращается True 
+    """
+    # разбор файла конфигурации задачи
+    cfg_task = get_cfg_task(filename_task)
+    maillist = cfg_task["adresslist"]
+    templatemail = cfg_task["template"]    
+    array_maillist = maillist.split("\n")    
+    try:
+        for address in array_maillist:
+            send_mail2(address,cfg_task["subject"],cfg_task["template"])
+    except Exception:
+        return False    
     return True
 
 # --------- маршруты
@@ -245,8 +293,7 @@ def create_task():
     if (request.method == "POST") and form.validate():        
         id_select_maillist = request.form["name_maillist"]
         id_select_template = request.form["name_templatemail"]
-        # print("id_select_maillist = ",id_select_maillist)
-        # print("id_select_template = ",id_select_template)
+        name_task = request.form["name_task"]
         if (id_select_maillist==-1) or (id_select_template==-1):
             flash("Невозможно создать задачу на отправку","error")
             return redirect(url_for(".index"))
@@ -257,18 +304,17 @@ def create_task():
         select_template=""
         for el in dict_data_template:
             if el["name_file"]==id_select_template:
-                select_template = el
+                select_template = el        
 
-        filename_task = create_cfg_task(path_absolute+path_task+generate_filename(path_absolute+path_task),id_select_maillist,id_select_template)
-
+        filename_task = create_cfg_task_full(path_absolute+path_task+generate_filename(path_absolute+path_task),id_select_maillist,id_select_template,name_task)
+        
         if filename_task!=False:  # проверяем создана ли задача           
             send_mail_from_task(filename_task)
             # после выполнения рассылки задача перемещается в папку done и 
             # имя задачи менятся на дату и время начала выполнения задачи
-            ar = os.path.split(filename_task)            
-            #print("filename_task = ",filename_task)
-            #print("templates/data/task_done/ +ar[-1] = ",os.path.exists("templates/data/task_done/"+ar[-1]))
+            ar = os.path.split(filename_task)                        
             os.rename(filename_task,"app/templates/data/task_done/"+ar[-1])
+        
 
         flash("Создана новая задача на отправку","success")
         return redirect(url_for(".index"))

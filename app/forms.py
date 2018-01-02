@@ -18,6 +18,8 @@ class CreateTaskForm(Form):
             data_maillist - список выбора списков рассылки   [(1,'one'),(2,'two')] 
             data_templatemail - список выбора шаблонов письма
         """        
+    
+    name_task = StringField("Название задачи", [validators.Length(min=5, max=100)])
     name_maillist = SelectField('Список рассылки')
     name_templatemail = SelectField('Шаблон письма ', default=1, choices=[(1,'one'),(2,'two')])
     # content_maillist = TextAreaField("Содержимое списка рассылки", [validators.Length(min=5)])    
