@@ -35,23 +35,6 @@ def createConfigMailSender(path,sender_mail,name_list):
         config.write(config_file)
     return True
 
-# кандидат на удаление
-def create_cfg_task(path, id_maillist=-1,id_template=-1):
-    """
-        Создание конфигурационного файла для задачи которую нужно выполнить, возвращает путь созданного задания отправки
-        файл задачи содержит только номера файлов списка рассылки и шаблоны письма
-    """
-    if (id_maillist==-1) and (id_template==-1):
-        return False
-
-    config = configparser.ConfigParser()
-    config.add_section("TASK")
-    config.set("TASK", "maillist",id_maillist)           
-    config.set("TASK", "templatemail",id_template)           
-    with open(path, "w") as config_file:
-        config.write(config_file)
-    return path
-
 def create_cfg_task_full(path, id_maillist=-1,id_template=-1,nametask="Безназвания"):
     """
         Создание конфигурационного файла для задачи которую нужно выполнить, возвращает путь созданного задания отправки
@@ -75,18 +58,6 @@ def create_cfg_task_full(path, id_maillist=-1,id_template=-1,nametask="Безн�
     with open(path, "w") as config_file:
         config.write(config_file)   
     return path
-
-# кндидат на удаление
-def get_cfg_task_old(path):
-    """
-        получение содержимого из файла конфигурации
-    """
-    result=dict()
-    data_cfg = configparser.ConfigParser()
-    data_cfg.read(path)        
-    result["maillist"] = data_cfg['TASK']['maillist']
-    result["templatemail"] = data_cfg['TASK']['templatemail']
-    return result
 
 def get_cfg_task(path):
     """
@@ -199,22 +170,6 @@ def get_content_maillist(path=path_absolute+path_sender_list):
         dict_data_maillist["name_file"] = i
         data_maillist.append(dict_data_maillist) 
     return data_maillist
-
-# кандидат на удаление
-def send_mail_from_task_old(filename_task): 
-    """
-        если задача обработана, возращается True и файл задачи переносится в папку data/task/done
-    """
-    # разбор файла конфигурации задачи
-    cfg_task = get_cfg_task(filename_task)
-    maillist = get_cfg_maillist(path_absolute+path_sender_list+cfg_task["maillist"])
-    templatemail = get_cfg_templatemail(path_absolute+path_template_mail+cfg_task["templatemail"])
-    print("templatemail = ",templatemail)
-    array_maillist = maillist["data"].split("\n")
-    # print("array_maillist = ",array_maillist)
-    for address in array_maillist:
-        send_mail2(address,templatemail["subject"],templatemail["template"])
-    return True
 
 def send_mail_from_task(filename_task):
     """
