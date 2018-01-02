@@ -1,0 +1,11 @@
+[TASK]
+nametask = asfdfsdfsdfsdfsdf
+
+[SENDERMAILLIST]
+namelist = яндекс список рассылки
+adresslist = ilnursoft@yandex.ru
+
+[TEMPLATEMAIL]
+subject = тестовый список яндекс
+template = ilnursoft@yandex.ru
+

@@ -1,0 +1,20 @@
+[TASK]
+nametask = какая-то еще рассылка
+
+[SENDERMAILLIST]
+namelist = тестовый список рассылки
+adresslist = i.saifutdinov@kazan.2gis.ru
+	ilnursoft@mail.ru
+	ilnursoft@yandex.ru
+
+[TEMPLATEMAIL]
+subject = новый шаблон письма
+template = <html xmlns="http://www.w3.org/1999/xhtml>
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	
+	<title>HTML LETTER</title>
+	
+	<style type="text/css">
+	@media only screen and (min-device-width: 601px) {.content {width: 600px !important;}}
+

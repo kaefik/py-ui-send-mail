@@ -5,11 +5,13 @@ from ..email import send_mail2
 import configparser
 from os import listdir
 import os
+import datetime
 
 path_absolute = "app/templates/"
 path_template_mail = "data/template_mail/"  # пусть где хранятся шаблоны писем
 path_sender_list = "data/sender_list/"  # пусть где хранятся списки отправки
 path_task = "data/task/"  # пусть где хранятся задачи
+path_task_done = "data/task_done/"  # пусть где хранятся выполненные задачи
 
 def createConfigMailTemplate(path,subject_mail,message_mail):
     """ 
@@ -140,6 +142,20 @@ def get_content_files(path=path_absolute+path_sender_list):
             content_files.append((name_file,f.read()))
     return content_files
 
+def get_content_task_done(path=path_absolute+path_task_done):
+    """
+        получение содержимое конфиг файлов выполненных задач
+    """
+    data_task = list()
+    file_names = listdir(path)
+    # print(file_names)   
+    
+    for i in file_names:
+        namefile = path+i
+        dict_data_task = get_cfg_task(namefile)
+        dict_data_task["name_file"] = i
+        data_task.append(dict_data_task)    
+    return data_task
 
 def get_content_templatemail(path=path_absolute+path_template_mail):
     """
@@ -267,8 +283,9 @@ def create_task():
             send_mail_from_task(filename_task)
             # после выполнения рассылки задача перемещается в папку done и 
             # имя задачи менятся на дату и время начала выполнения задачи
-            ar = os.path.split(filename_task)                        
-            os.rename(filename_task,"app/templates/data/task_done/"+ar[-1])
+            ar = os.path.split(filename_task) 
+            now = datetime.datetime.now()                       
+            os.rename(filename_task,"app/templates/data/task_done/"+str(now))
         
 
         flash("Создана новая задача на отправку","success")
@@ -285,6 +302,11 @@ def view_maillist():
 def view_templatemail():    
     data_templatemail = get_content_templatemail(path_absolute+path_template_mail)           
     return render_template("view-templatemail.html",data=data_templatemail)
+
+@main.route("/view-task-done")
+def view_task_done():    
+    data_task = get_content_task_done(path_absolute+path_task_done)           
+    return render_template("view-task-done.html",data=data_task)
 
 @main.route("/about")
 def about():
